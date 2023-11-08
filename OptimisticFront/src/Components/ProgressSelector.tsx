@@ -2,6 +2,8 @@ import { Flex, Text, chakra } from "@chakra-ui/react";
 import React from "react";
 import CheckBox from "./SvgIcons/CheckBox";
 import CheckBoxBlank from "./SvgIcons/CheckBoxBlank";
+
+
 const SelectOption = chakra(Flex, {
   baseStyle: {
     flexDirection: "row",
@@ -38,16 +40,7 @@ const IconContainer = chakra(Flex, {
     justifyContent: "center",
   },
 });
-
-enum Progress {
-  "TO_DO" = "todo",
-  "DOING" = "doing",
-  "DONE" ="done",
-}
-
-type ProgressType = typeof Progress[keyof typeof Progress];
-
-
+ 
 
 
 type ProgressSelectorProps = {

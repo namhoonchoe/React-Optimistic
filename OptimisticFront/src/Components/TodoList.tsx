@@ -1,13 +1,12 @@
 import {
   Button,
   Flex,
-  FormControl,
   Text,
   chakra
 } from "@chakra-ui/react"
 import { useState } from "react"
 import ProgressSelector from "./ProgressSelector"
-
+import AddIcon from "./SvgIcons/AddIcon"
 
 const TodoListLayout = chakra(Flex,{
   baseStyle:{
@@ -50,21 +49,25 @@ const ListContainer = chakra(Flex, {
   }
 })
 
+/**
+ * chakra ui form 사용법 자세히 알아보자 그냥 form 적용안됨
+ * 
+ */
 
-const AddTodoForm = chakra(FormControl, {
+const AddTodoForm = chakra('form', {
   baseStyle:{
     width:"100%",
     height:"3.5rem",
     display:"flex",
     justifyContent:"space-between",
     alignItems:"center",
-    padding:`0.25rem`
+    padding:`0.25rem 0.5rem`
   }
 })
 
 const AddTodoInput = chakra('input',{
   baseStyle:{
-    width:"84%",
+    width:"88%",
     height:"80%",
     borderRadius:"0.8rem",
     border:"1px",
@@ -72,17 +75,43 @@ const AddTodoInput = chakra('input',{
   }
 })
 
-enum Progress {
-  "TO_DO" = "todo",
-  "DOING" = "doing",
-  "DONE" ="done",
-}
-
-type ProgressType = typeof Progress[keyof typeof Progress];
-//이 부분은 조금더 연구가 필요함!
+/**
+ * 이 부분은 조금더 연구가 필요함!
+ * https://velog.io/@sensecodevalue/Typescript-Enum-%EC%99%9C-%EC%93%B0%EC%A7%80-%EB%A7%90%EC%95%84%EC%95%BC%ED%95%98%EC%A3%A0
+ */
 
 export default function TodoList() {
   const [selectedStatus, setSelectedStatus] = useState<ProgressType>(Progress.TO_DO)
+
+  const [newTodo, setNewTodo] = useState<TodoListItemType>({
+    task: "",
+    id: "",
+    progress: Progress.TO_DO,
+  });
+
+  const [todos, setTodos] = useState<Array<TodoListItemType>>([])
+
+
+  const changeHandler:React.ChangeEventHandler<HTMLInputElement>=(e) => {
+      e.preventDefault()
+      /*스프레드 순서 기억! 뒤에 붙이면 앞의 값이 초기화됨 */
+        setNewTodo({
+          ...newTodo,
+          task:e.target.value,
+          id:crypto.randomUUID(),
+        })
+  }
+
+  const submitHandler:React.FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault()
+      setTodos([...todos,newTodo])
+      setNewTodo({
+        task:"",
+        id:"",
+        progress: Progress.TO_DO,
+      })
+      console.log(todos)
+  }
 
   const handleProgress = (target:ProgressType) => {
     return setSelectedStatus(target)
@@ -97,18 +126,20 @@ export default function TodoList() {
           </Text>
         </TodoListHeading>
       <ProgressSelector 
-      firstOption={Progress.TO_DO} 
-      secondOption={Progress.DOING} 
-      thirdOption={Progress.DONE} 
-      selectedOption={selectedStatus} 
-      handleProgress={handleProgress}/>
+        firstOption={Progress.TO_DO} 
+        secondOption={Progress.DOING} 
+        thirdOption={Progress.DONE} 
+        selectedOption={selectedStatus} 
+        handleProgress={handleProgress}/>
       </TodoListHeader>
       <ListContainer>
 
       </ListContainer>
-      <AddTodoForm>
-        <AddTodoInput/>
-        <Button/>
+      <AddTodoForm onSubmit={submitHandler} >
+        <AddTodoInput onChange={changeHandler} value={newTodo.task} placeholder="add new todos here" />
+        <Button width={"2rem"} height={"2rem"} justifyContent={"center"} alignItems={"center"} padding={0} type={"submit"} >
+          <AddIcon/>
+        </Button>
       </AddTodoForm>
     </TodoListLayout>
   )

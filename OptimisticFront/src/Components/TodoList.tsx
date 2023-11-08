@@ -7,6 +7,7 @@ import {
 import { useState } from "react"
 import ProgressSelector from "./ProgressSelector"
 import AddIcon from "./SvgIcons/AddIcon"
+import { Options, OptionsType, TodoListItemType } from "./types"
 
 const TodoListLayout = chakra(Flex,{
   baseStyle:{
@@ -45,13 +46,19 @@ const TodoListHeading = chakra(Flex,{
 
 const ListContainer = chakra(Flex, {
   baseStyle:{
-
+    width:"100%",
+    maxHeight:"40vh",
+    overflowY:"scroll",
+    flexDirection:"column",
+    alignItems:"start",
+    justifyContent:"center"
   }
 })
 
 /**
- * chakra ui form 사용법 자세히 알아보자 그냥 form 적용안됨
- * 
+ * chakra ui form 사용법 자세히 알아보자
+ * Form?? => div태그로 인식됨
+ *  그냥 form 적용해야함!
  */
 
 const AddTodoForm = chakra('form', {
@@ -71,7 +78,9 @@ const AddTodoInput = chakra('input',{
     height:"80%",
     borderRadius:"0.8rem",
     border:"1px",
-    borderColor:"gray.400"
+    borderColor:"gray.400",
+    paddingX:"0.5rem",
+    textTransform:"capitalize"
   }
 })
 
@@ -81,12 +90,12 @@ const AddTodoInput = chakra('input',{
  */
 
 export default function TodoList() {
-  const [selectedStatus, setSelectedStatus] = useState<ProgressType>(Progress.TO_DO)
+  const [selectedStatus, setSelectedStatus] = useState<OptionsType>(Options.TO_DO)
 
   const [newTodo, setNewTodo] = useState<TodoListItemType>({
     task: "",
     id: "",
-    progress: Progress.TO_DO,
+    progress: Options.TO_DO,
   });
 
   const [todos, setTodos] = useState<Array<TodoListItemType>>([])
@@ -108,12 +117,12 @@ export default function TodoList() {
       setNewTodo({
         task:"",
         id:"",
-        progress: Progress.TO_DO,
+        progress: Options.TO_DO,
       })
       console.log(todos)
   }
 
-  const handleProgress = (target:ProgressType) => {
+  const handleProgress = (target:OptionsType) => {
     return setSelectedStatus(target)
   } 
 
@@ -126,9 +135,6 @@ export default function TodoList() {
           </Text>
         </TodoListHeading>
       <ProgressSelector 
-        firstOption={Progress.TO_DO} 
-        secondOption={Progress.DOING} 
-        thirdOption={Progress.DONE} 
         selectedOption={selectedStatus} 
         handleProgress={handleProgress}/>
       </TodoListHeader>

@@ -2,7 +2,8 @@ import { Flex, Text, chakra } from "@chakra-ui/react";
 import React from "react";
 import CheckBox from "./SvgIcons/CheckBox";
 import CheckBoxBlank from "./SvgIcons/CheckBoxBlank";
-
+import TodoIcon from "./SvgIcons/ToDoIcon";
+import { Options, OptionsType } from "./types";
 
 const SelectOption = chakra(Flex, {
   baseStyle: {
@@ -40,43 +41,43 @@ const IconContainer = chakra(Flex, {
     justifyContent: "center",
   },
 });
- 
-
 
 type ProgressSelectorProps = {
-  firstOption: Progress.TO_DO;
-  secondOption: Progress.DOING;
-  thirdOption: Progress.DONE;
-  selectedOption: Progress;
-  handleProgress:(target: ProgressType) => void
+ 
+  selectedOption: Options;
+  handleProgress: (target: OptionsType) => void;
 };
 
 const ProgressSelector: React.FC<ProgressSelectorProps> = ({
-  firstOption,
-  secondOption,
-  thirdOption,
+ 
   selectedOption,
-  handleProgress
+  handleProgress,
 }) => {
   return (
     <SelectOption>
-      <OptionContainer onClick={() => handleProgress(firstOption)}>
+      <OptionContainer  onClick={() => handleProgress(Options.ALL)}>
         <IconContainer>
-          {selectedOption === firstOption ? <CheckBox /> : <CheckBoxBlank />}
+          <TodoIcon />
         </IconContainer>
-        <OptionTitle>{firstOption}</OptionTitle>
+        <OptionTitle>All</OptionTitle>
       </OptionContainer>
-      <OptionContainer  onClick={() => handleProgress(secondOption)}>
+      <OptionContainer onClick={() => handleProgress(Options.TO_DO)}>
         <IconContainer>
-          {selectedOption === secondOption ? <CheckBox /> : <CheckBoxBlank />}
+          {selectedOption === Options.TO_DO ? <CheckBox /> : <CheckBoxBlank />}
         </IconContainer>
-        <OptionTitle> {secondOption}</OptionTitle>
+        <OptionTitle>{Options.TO_DO}</OptionTitle>
       </OptionContainer>
-      <OptionContainer  onClick={() => handleProgress(thirdOption)}>
+      <OptionContainer onClick={() => handleProgress(Options.DOING)}>
         <IconContainer>
-          {selectedOption === thirdOption ? <CheckBox /> : <CheckBoxBlank />}
+          {selectedOption === Options.DOING ? <CheckBox /> : <CheckBoxBlank />}
         </IconContainer>
-        <OptionTitle>{thirdOption} </OptionTitle>
+        <OptionTitle> {Options.DOING}</OptionTitle>
+      </OptionContainer>
+      <OptionContainer onClick={() => handleProgress(Options.DONE)}>
+        <IconContainer>
+          {selectedOption === Options.DONE ? <CheckBox /> : <CheckBoxBlank />}
+        </IconContainer>
+        <OptionTitle>{Options.DONE} </OptionTitle>
       </OptionContainer>
     </SelectOption>
   );

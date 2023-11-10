@@ -39,11 +39,11 @@ const TodoListHeading = chakra(Flex, {
 const ListContainer = chakra(Flex, {
   baseStyle: {
     width: "100%",
-    maxHeight: "30vh",
-    overflowY: "scroll",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "start",
+    maxHeight:"30dvh",
+    overflowY:"scroll",
+    flexDirection:"column",
+    alignItems:"start",
+    justifyContent:"start",
   },
 });
 
@@ -61,6 +61,7 @@ const AddTodoForm = chakra("form", {
     justifyContent: "space-between",
     alignItems: "center",
     padding: `0.25rem 0.5rem`,
+    boxShadow: `1.5px 0px 1.5px 0px rgba(113,	128,	150, 1)`,
   },
 });
 
@@ -83,7 +84,7 @@ const AddTodoInput = chakra("input", {
 
 export default function TodoList() {
   const [selectedStatus, setSelectedStatus] = useState<OptionsType>(
-    Options.TO_DO
+    Options.ALL
   );
 
   const [newTodo, setNewTodo] = useState<TodoListItemType>({

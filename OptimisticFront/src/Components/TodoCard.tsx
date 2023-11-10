@@ -1,31 +1,34 @@
 import { Button, Flex, Text, chakra } from "@chakra-ui/react";
 import React, { useState } from "react";
+import ModalWrapper from "./ModalWrapper";
+import ProgressIndicator from "./ProgressIndicator";
 import DeleteIcon from "./SvgIcons/DeleteIcon";
 import EditIcon from "./SvgIcons/EditIcon";
-import SaveIcon from "./SvgIcons/SaveIcon";
 import { Options } from "./types";
 
 type TodoCardPropType = {
-  progress?: Options;
+  progress: Options;
   task: string;
   id: string;
-  deleteTodo:(id: string) => void
+  deleteTodo: (id: string) => void;
 };
 
 const CardLayout = chakra(Flex, {
   baseStyle: {
     width: "100%",
     height: "4rem",
+    minHeight: "4rem",
     padding: "0.5rem",
-    justifyContent:"space-between",
+    justifyContent: "space-between",
     alignItems: "center",
-    boxShadow:` 0 1px rgba(113,	128,	150, 0.4)`,
+    boxShadow: ` 0 1px rgba(113,	128,	150, 0.4)`,
   },
 });
 
+
 const EditFormContainer = chakra(Flex, {
   display: "flex",
-  justifyContent: "spaceBetween",
+  justifyContent: "space-between",
   alignItems: "center",
 });
 
@@ -34,7 +37,7 @@ const EditForm = chakra("form", {
     width: "100%",
     height: "80%",
     display: "flex",
-    justifyContent: "spaceBetween",
+    justifyContent: "space-between",
     alignItems: "center",
     padding: `0.25rem 0.5rem`,
   },
@@ -50,7 +53,7 @@ const EditFormInput = chakra("input", {
     paddingX: "0.5rem",
     textTransform: "capitalize",
   },
-});
+}); 
 
 const IconContainer = chakra(Flex, {
   baseStyle: {
@@ -70,56 +73,101 @@ const TodoTask = chakra(Text, {
 });
 
 const ControlPanel = chakra(Flex, {
-  baseStyle: {},
+  baseStyle: {
+    width: "15%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "space-between",
+    opacity: 0,
+    _hover: {
+      opacity: 1,
+    },
+  },
 });
 
-const TodoCard: React.FC<TodoCardPropType> = ({  task, id, deleteTodo }) => {
+const DeleteForm = chakra(Flex, {
+  baseStyle: {
+    flexDirection:"column",
+    width: "100%",
+    height: "20vh",
+    justifyContent: "center",
+    alignItems: "start",
+  },
+});
+
+const ModalButtonContainer = chakra(Flex, {
+  baseStyle: {
+    width: "100%",
+    height: "30%",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+  },
+});
+
+const TodoCard: React.FC<TodoCardPropType> = ({
+  task,
+  id,
+  deleteTodo,
+  progress,
+}) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
   //const [newTask, setNewTask] = useState<string>("");
 
   const toggleEdit = () => {
     setIsEditing(!isEditing);
   };
 
+  const toggleDelete = () => {
+    setIsDeleting(!isDeleting);
+  };
+
   const handleDelte = () => {
-    deleteTodo(id)
-  }
+    deleteTodo(id);
+  };
 
   return (
-    <CardLayout>
-      {isEditing ? (
+    <>
+      <ModalWrapper isEditting={isEditing} editHandler={toggleEdit}>
         <EditFormContainer>
           <EditForm>
-            <EditFormInput />
-            <Button
-              width={"2rem"}
-              height={"2rem"}
-              justifyContent={"center"}
-              alignItems={"center"}
-              padding={0}
-              type={"submit"}
-            >
-              <SaveIcon />
+            <EditFormInput/>
+            <ModalButtonContainer>
+            <Button colorScheme="blue" mr={3} >
+              수정
             </Button>
+            <Button onClick={toggleEdit}>닫기</Button>
+          </ModalButtonContainer>
           </EditForm>
         </EditFormContainer>
-      ) : (
-        <>
-          {/**진행상황 아이콘 표시하기 */}
-          <TodoTask>{task}</TodoTask>
+        
+      </ModalWrapper>
 
-          {/**진행상황 선택할 수 있도록 수정 */}
-          <ControlPanel>
-            <IconContainer onClick={toggleEdit}>
-              <EditIcon />
-            </IconContainer>
-            <IconContainer onClick={handleDelte}>
-              <DeleteIcon />
-            </IconContainer>
-          </ControlPanel>
-        </>
-      )}
-    </CardLayout>
+      <ModalWrapper isEditting={isDeleting} editHandler={toggleDelete}>
+        <DeleteForm>
+          <p>정말로 삭제 하시겠습니까?</p>
+          <ModalButtonContainer>
+            <Button colorScheme="blue" mr={3} onClick={handleDelte}>
+              삭제
+            </Button>
+            <Button onClick={toggleDelete}>닫기</Button>
+          </ModalButtonContainer>
+        </DeleteForm>
+      </ModalWrapper>
+      <CardLayout>
+        <ProgressIndicator progress={progress} />
+        <TodoTask>{task}</TodoTask>
+
+        <ControlPanel>
+          <IconContainer onClick={toggleEdit}>
+            <EditIcon />
+          </IconContainer>
+          <IconContainer onClick={toggleDelete}>
+            <DeleteIcon />
+          </IconContainer>
+        </ControlPanel>
+      </CardLayout>
+    </>
   );
 };
 

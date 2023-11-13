@@ -1,8 +1,10 @@
 import { Button, Flex, Text, chakra } from "@chakra-ui/react";
 import { useState } from "react";
+import { useRecoilState } from "recoil";
 import ProgressSelector from "./ProgressSelector";
 import AddIcon from "./SvgIcons/AddIcon";
 import TodoCard from "./TodoCard";
+import { todoListState } from "./atoms";
 import { Options, OptionsType, TodoListItemType } from "./types";
 
 const TodoListLayout = chakra(Flex, {
@@ -93,7 +95,9 @@ export default function TodoList() {
     progress: Options.TO_DO,
   });
 
-  const [todos, setTodos] = useState<Array<TodoListItemType>>([]);
+  const [todos, setNewTodos] = useRecoilState(todoListState)
+
+  
 
   const changeHandler: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     e.preventDefault();
@@ -107,25 +111,16 @@ export default function TodoList() {
 
   const submitHandler: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
-    setTodos([...todos, newTodo]);
+    setNewTodos([...todos, newTodo]);
     setNewTodo({
       task: "",
       id: "",
       progress: Options.TO_DO,
     });
-    console.log(todos);
   };
-  /*
-  const editTodo = (id:string,newTask:string, progress:Options ) => {
-    const target = todos.filter((todo) => todo.id === id)
 
-  }
-*/
 
-  const deleteTodo = (id: string) => {
-    const newTodos = todos.filter((todo) => todo.id !== id);
-    setTodos(newTodos);
-  };
+ 
 
   const handleProgress = (target: OptionsType) => {
     return setSelectedStatus(target);
@@ -154,7 +149,7 @@ export default function TodoList() {
           todos.map((todo: TodoListItemType) => {
             return (
               <TodoCard
-                deleteTodo={deleteTodo}
+                  
                 task={todo.task}
                 id={todo.id}
                 progress={todo.progress}

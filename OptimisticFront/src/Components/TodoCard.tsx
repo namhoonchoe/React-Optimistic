@@ -1,16 +1,17 @@
 import { Button, Flex, Text, chakra } from "@chakra-ui/react";
 import React, { useState } from "react";
+import { useRecoilState } from "recoil";
 import ModalWrapper from "./ModalWrapper";
 import ProgressIndicator from "./ProgressIndicator";
 import DeleteIcon from "./SvgIcons/DeleteIcon";
 import EditIcon from "./SvgIcons/EditIcon";
-import { Options } from "./types";
+import { todoListState } from "./atoms";
+import { Options, TodoListItemType } from "./types";
 
 type TodoCardPropType = {
   progress: Options;
   task: string;
   id: string;
-  deleteTodo: (id: string) => void;
 };
 
 const CardLayout = chakra(Flex, {
@@ -24,7 +25,6 @@ const CardLayout = chakra(Flex, {
     boxShadow: ` 0 1px rgba(113,	128,	150, 0.4)`,
   },
 });
-
 
 const EditFormContainer = chakra(Flex, {
   display: "flex",
@@ -53,7 +53,7 @@ const EditFormInput = chakra("input", {
     paddingX: "0.5rem",
     textTransform: "capitalize",
   },
-}); 
+});
 
 const IconContainer = chakra(Flex, {
   baseStyle: {
@@ -87,7 +87,7 @@ const ControlPanel = chakra(Flex, {
 
 const DeleteForm = chakra(Flex, {
   baseStyle: {
-    flexDirection:"column",
+    flexDirection: "column",
     width: "100%",
     height: "20vh",
     justifyContent: "center",
@@ -104,15 +104,55 @@ const ModalButtonContainer = chakra(Flex, {
   },
 });
 
-const TodoCard: React.FC<TodoCardPropType> = ({
-  task,
-  id,
-  deleteTodo,
-  progress,
-}) => {
+const TodoCard: React.FC<TodoCardPropType> = ({ task, id, progress }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
-  //const [newTask, setNewTask] = useState<string>("");
+  const [newTask, setNewTask] = useState<string>("");
+  const [newProgress, setNewProgress] = useState<Options>();
+  const [todos, setNewTodos] = useRecoilState(todoListState);
+
+  const editTodo = (id: string) => {
+    const [target] = todos.filter((todo) => todo.id === id);
+    const targetIndex = todos.indexOf(target);
+
+    let renewedTodo: TodoListItemType = {
+      id: "",
+      task: "",
+      progress: Options.DONE,
+    };
+
+    if (newTask === "" && newProgress) {
+      renewedTodo = { ...target, progress: newProgress };
+      return setNewTodos([
+        ...todos.slice(0, targetIndex),
+        renewedTodo,
+        ...todos.slice(targetIndex + 1),
+      ]);
+    }
+
+    if (newTask !== "" && !newProgress) {
+      renewedTodo = { ...target, task: newTask };
+      return setNewTodos([
+        ...todos.slice(0, targetIndex),
+        renewedTodo,
+        ...todos.slice(targetIndex + 1),
+      ]);
+    }
+
+    if (newTask !== "" && newProgress) {
+      renewedTodo = { ...target, task: newTask, progress: newProgress };
+      return setNewTodos([
+        ...todos.slice(0, targetIndex),
+        renewedTodo,
+        ...todos.slice(targetIndex + 1),
+      ]);
+    }
+  };
+
+  const deleteTodo = (id: string) => {
+    const newTodos = todos.filter((todo) => todo.id !== id);
+    setNewTodos(newTodos);
+  };
 
   const toggleEdit = () => {
     setIsEditing(!isEditing);
@@ -124,23 +164,37 @@ const TodoCard: React.FC<TodoCardPropType> = ({
 
   const handleDelte = () => {
     deleteTodo(id);
+    toggleDelete();
+  };
+
+  const changeHandler: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    e.preventDefault();
+    /*스프레드 순서 기억! 뒤에 붙이면 앞의 값이 초기화됨 */
+    setNewTask(e.target.value);
+  };
+
+  const submitHandler: React.FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+    editTodo(id);
+    console.log(`${newTask} task renewed`);
+    setNewTask("");
+    toggleEdit()
   };
 
   return (
     <>
       <ModalWrapper isEditting={isEditing} editHandler={toggleEdit}>
         <EditFormContainer>
-          <EditForm>
-            <EditFormInput/>
+          <EditForm onSubmit={submitHandler}>
+            <EditFormInput onChange={changeHandler} />
             <ModalButtonContainer>
-            <Button colorScheme="blue" mr={3} >
-              수정
-            </Button>
-            <Button onClick={toggleEdit}>닫기</Button>
-          </ModalButtonContainer>
+              <Button colorScheme="blue" mr={3} type="submit">
+                수정
+              </Button>
+              <Button onClick={toggleEdit}>닫기</Button>
+            </ModalButtonContainer>
           </EditForm>
         </EditFormContainer>
-        
       </ModalWrapper>
 
       <ModalWrapper isEditting={isDeleting} editHandler={toggleDelete}>

@@ -43,7 +43,6 @@ const IconContainer = chakra(Flex, {
 });
 
 type ProgressSelectorProps = {
- 
   selectedOption: Options;
   handleProgress: (target: OptionsType) => void;
 };
